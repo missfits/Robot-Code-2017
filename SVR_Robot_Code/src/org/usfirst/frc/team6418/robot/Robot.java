@@ -87,9 +87,6 @@ public class Robot extends IterativeRobot {
 		// chooser.addObject("My Auto", new MyAutoCommand());
 		SmartDashboard.putData("Auto mode", chooser);
 
-		cam0 = CameraServer.getInstance().startAutomaticCapture(0);
-	  	cam1 = CameraServer.getInstance().startAutomaticCapture(1);
-	  	server = CameraServer.getInstance().getServer();
 		//	cam0 = CameraServer.getInstance().startAutomaticCapture(0);			
 	
 		//how to call: public void tankDrive(double x, double y)
@@ -109,6 +106,19 @@ public class Robot extends IterativeRobot {
 		TriggerButton.whenPressed(new SetTankDrive());
 		SideButton.whenPressed(new SetArcadeDrive());
 		RightButton.whenPressed(new SetTankDriveBack());
+		
+		double KpR=9/72.0;
+		double KpL=9/72.0;
+		double Ki = 0.01/72.0;
+		double Kd= 1/72.0;
+		double Kf = 1.0;
+		
+		leftEncoder.reset();
+		rightEncoder.reset();
+		
+		this.right = new Good_DriveSide(KpR, Ki, Kd, Kf, rightEncoder, rightSpark);
+//		right.setInverted(true);
+		this.left = new Good_DriveSide(KpL, Ki, Kd, Kf, leftEncoder, leftSpark);
 	
 	}
 
@@ -121,8 +131,8 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void disabledInit() {
-		this.left.disable();
-		this.right.disable();
+		Robot.left.disable();
+		Robot.right.disable();
 
 	}
 
@@ -151,7 +161,7 @@ public class Robot extends IterativeRobot {
 		System.out.println();
 		System.out.println();
 		
-		state = "rightforward1";
+		state = "middleforward1";
 		
 		double KpR=9/72.0;
 		double KpL=9/72.0;
@@ -163,7 +173,7 @@ public class Robot extends IterativeRobot {
 		rightEncoder.reset();
 		
 		this.right = new Good_DriveSide(KpR, Ki, Kd, Kf, rightEncoder, rightSpark);
-		right.setInverted(true);
+//		right.setInverted(true);
 		this.left = new Good_DriveSide(KpL, Ki, Kd, Kf, leftEncoder, leftSpark);
 
 		
@@ -197,28 +207,27 @@ public class Robot extends IterativeRobot {
 		
 		Scheduler.getInstance().run();
 	
-		//	System.out.println("encoder count: "+ ((Good_DriveSide) left).getEncoderCount());
-			//QUESTION: if i made my own method inside good_driveside, which implements speedController
-			//do I have to cast left as a goodDriveside instead of speedcontroller?
-		/*	
-		 * type in the number of feet you want to go, it'll go until it reaches that distance*/
-		
-	/*	THIS CODE IS TO TEST THE ENCODERS!! 
-	
-	if (leftEncoder.getDistance() < feetToEncUnits(5) && rightEncoder.getDistance() < feetToEncUnits(5)) {
+//			System.out.println("left encoder count: "+ ((Good_DriveSide) left).getEncoderCount());
+//			System.out.println("right encoder count: "+ ((Good_DriveSide) right).getEncoderCount());
+			
+
+	//	THIS CODE IS TO TEST THE ENCODERS!! 
+/*
+	if (leftEncoder.getDistance() < feetToEncUnits(5) && rightEncoder.getDistance() > feetToEncUnits(-5)) {
 			//rotations: X * 2400 / 360 
 			//feet: 
 			left.set(.3);
-			right.set
-			\\System.out.println("        !        ");
+			right.set(-.3);
+			System.out.println("left distance:" + leftEncoder.getDistance());
+			System.out.println("right distance:" + rightEncoder.getDistance());
 			
 		}
 		else {
 			System.out.println("    it went 5 feet    ");
 			left.set(0);
 			right.set(0);
-		}  */
-
+		}  
+	} */
 
 		//10.83 feet = 129.96 inches
 		//9.5167 feet = 114.3 inches
@@ -226,17 +235,16 @@ public class Robot extends IterativeRobot {
 		//from left and right positions not the middle
 		
 		//middle lane 
-		System.out.println(state);
+//		System.out.println(state);
 		if (state.equals("middleforward1")) {//midlane
 		//	moveForward(9.00);
-			moveForward(9.0, 0.6, left, leftEncoder);
-			moveForward(9.0, 0.6, right, rightEncoder);
-			moveForward(0.5, 0.1, left, leftEncoder);
-			moveForward(0.5, 0.1, right, rightEncoder);	
+			leftmoveForward(9.0, 0.6);
+			rightmoveForward(9.0, 0.6);
 			if (finishedMoving(9.5)) 
 				state = "stop";
 		}
-		
+	}
+/*		
 		//right lane 
 		else if (state.equals("rightforward1")) {
 			moveForward(9.0, 0.6, left, leftEncoder);
@@ -268,7 +276,7 @@ public class Robot extends IterativeRobot {
 			if (finishedMoving(9.5))
 				state = "leftturn1";
 		}
-		else if (state.equals("leftturn1")){//c'est une tournee gauche
+		else if (state.equals("leftturn1")){
 			changeAngle(-120);
 			if (finishedTurning(-120))
 				state = "leftforward2";
@@ -291,7 +299,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	
-	
+	*/
 	
 	@Override
 	public void teleopInit() {
@@ -366,21 +374,33 @@ public class Robot extends IterativeRobot {
 	}
 	
 	
-	public void moveForward(double feet, double speed, SpeedController side, Encoder enc) {	
+	public void leftmoveForward(double feet, double speed) {	
 		
-		if (enc.getDistance() < feetToEncUnits(feet)) {
+		if (leftEncoder.getDistance() < feetToEncUnits(feet)) {
 			//rotations: X * 2400 / 360 
 			//feet: 
-			side.set(speed);
+			left.set(speed);
 		}
 		else {
-			side.set(0);
+			System.out.println("left side went " + feet);
+			left.set(0);
+		} 
+	}
+	public void rightmoveForward(double feet, double speed) {	
+		
+		if (rightEncoder.getDistance() > feetToEncUnits(-feet)) {
+			//rotations: X * 2400 / 360 
+			//feet: 
+			right.set(-speed);
+		}
+		else {
+			System.out.println("right side went " + feet);
+			right.set(0);
 		} 
 	}
 	
-	
 	public boolean finishedMoving(double feet) {
-		if (leftEncoder.getDistance() < feetToEncUnits(feet) && rightEncoder.getDistance() < feetToEncUnits(feet)) {
+		if (leftEncoder.getDistance() < feetToEncUnits(feet) && rightEncoder.getDistance() > feetToEncUnits(-feet)) {
 			return false;
 		}
 		else 
