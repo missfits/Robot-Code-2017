@@ -161,7 +161,7 @@ public class Robot extends IterativeRobot {
 		System.out.println();
 		System.out.println();
 		
-		state = "middleforward1";
+		state = "rightforward1";
 		
 		double KpR=9/72.0;
 		double KpL=9/72.0;
@@ -243,36 +243,48 @@ public class Robot extends IterativeRobot {
 			if (finishedMoving(9.5)) 
 				state = "stop";
 		}
-	}
-/*		
+	
+		
 		//right lane 
 		else if (state.equals("rightforward1")) {
-			moveForward(9.0, 0.6, left, leftEncoder);
-			moveForward(9.0, 0.6, right, rightEncoder);		
-			moveForward(0.5, 0.1, left, leftEncoder);
-			moveForward(0.5, 0.1, right, rightEncoder);
-			if (finishedMoving(9.5))
+			System.out.println("State is rightforward1!");
+			leftmoveForward(3.0, 0.2);
+			rightmoveForward(3.0, 0.2);	
+			if (finishedMoving(3))
+				state = "rightforward2";
+		}
+		
+		else if (state.equals("rightforward2")) {
+			System.out.println("State is rightforward2!");
+			leftmoveForward(0.5, 0.1);
+			rightmoveForward(0.5, 0.1);
+			if (finishedMoving(.5))
 				state = "rightturn1";
 		}
 		else if (state.equals("rightturn1")) {
 			//this is a right turn
+			System.out.println("State is rightturn1!");
 			changeAngle(10); 
 			if (finishedTurning(10))
-				state = "rightforward2";
+				state = "rightforward3";
 		}
-		else if (state.equals("rightforward2")) {
-			moveForward(0.5, 0.1, left, leftEncoder);
-			moveForward(0.5, 0.1, right, rightEncoder);
+		else if (state.equals("rightforward3")) {
+			System.out.println("State is rightforward3!");
+			leftmoveForward(0.5, 0.1);
+			rightmoveForward(0.5, 0.1);
 			if (finishedMoving(.5))
 				state = "stop";
 		}
 		
+	
+
+		
 		//leftlane
 		else if (state.equals("leftforward1")) {
-			moveForward(9.0, 0.6, left, leftEncoder);
-			moveForward(9.0, 0.6, right, rightEncoder);		
-			moveForward(0.5, 0.1, left, leftEncoder);
-			moveForward(0.5, 0.1, right, rightEncoder);
+			leftmoveForward(9.0, 0.2);
+			rightmoveForward(9.0, 0.2);		
+			leftmoveForward(0.5, 0.1);
+			rightmoveForward(0.5, 0.1);
 			if (finishedMoving(9.5))
 				state = "leftturn1";
 		}
@@ -282,8 +294,8 @@ public class Robot extends IterativeRobot {
 				state = "leftforward2";
 		}
 		else if (state.equals("leftforward2")) {	
-			moveForward(0.5, 0.1, left, leftEncoder);
-			moveForward(0.5, 0.1, right, rightEncoder);
+			leftmoveForward(0.5, 0.1);
+			rightmoveForward(0.5, 0.1);
 			if (finishedMoving(.5));
 				state = "stop";
 		}
@@ -299,7 +311,7 @@ public class Robot extends IterativeRobot {
 	}
 	
 	
-	*/
+	
 	
 	@Override
 	public void teleopInit() {
@@ -382,7 +394,6 @@ public class Robot extends IterativeRobot {
 			left.set(speed);
 		}
 		else {
-			System.out.println("left side went " + feet);
 			left.set(0);
 		} 
 	}
@@ -394,7 +405,6 @@ public class Robot extends IterativeRobot {
 			right.set(-speed);
 		}
 		else {
-			System.out.println("right side went " + feet);
 			right.set(0);
 		} 
 	}
@@ -406,6 +416,7 @@ public class Robot extends IterativeRobot {
 		else 
 			leftEncoder.reset();
 			rightEncoder.reset();
+			System.out.println("finished moving!");
 			return true;
 	}
 	
@@ -419,7 +430,7 @@ public class Robot extends IterativeRobot {
 			if (gyro.getAngle() > degrees) {
 				left.set(0);
 				right.set(0);
-			}
+			} 
 			else {
 				right.set(.05);
 				left.set(-.05);
