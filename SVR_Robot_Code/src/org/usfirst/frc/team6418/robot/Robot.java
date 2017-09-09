@@ -250,16 +250,20 @@ public class Robot extends IterativeRobot {
 			System.out.println("State is rightforward1!");
 			leftmoveForward(3.0, 0.2);
 			rightmoveForward(3.0, 0.2);	
-			if (finishedMoving(3))
+			if (finishedMoving(3)){
+				System.out.println("left Encoder = " + leftEncoder.getDistance());
 				state = "rightforward2";
+			}
 		}
 		
 		else if (state.equals("rightforward2")) {
 			System.out.println("State is rightforward2!");
-			leftmoveForward(0.5, 0.1);
-			rightmoveForward(0.5, 0.1);
-			if (finishedMoving(.5))
+			leftmoveForward(1.5, 0.1);
+			rightmoveForward(1.5, 0.1);
+			if (finishedMoving(1.5)){
+				System.out.println("left Encoder = " + leftEncoder.getDistance());
 				state = "rightturn1";
+			}
 		}
 		else if (state.equals("rightturn1")) {
 			//this is a right turn
@@ -270,15 +274,24 @@ public class Robot extends IterativeRobot {
 		}
 		else if (state.equals("rightforward3")) {
 			System.out.println("State is rightforward3!");
-			leftmoveForward(0.5, 0.1);
-			rightmoveForward(0.5, 0.1);
-			if (finishedMoving(.5))
+			leftmoveForward(1.5, 0.1);
+			rightmoveForward(1.5, 0.1);
+			//was missing the brackets! for the if statement
+			if (finishedMoving(6)){
+				System.out.println("left Encoder = " + leftEncoder.getDistance());
 				state = "stop";
+			}
 		}
 		
+		//when i changed finishedMoving to 6 instead of 1.5 it moved forward... but it should have reset... 
+		//it's not properly resetting the encoders? i think
+		//the display is not printing "left encoder= "for the states other than rightForward3.
+		//its not printing to the console of the driver station, all of the outputs are going to "Riolog" within Java
+		//Riolog is another popup within Java, I'm not sure how to get it to go back to Driver Station. 
 	
 
-		
+		//have not tested left side yet. Need to. 
+		//need to get measurements. 
 		//leftlane
 		else if (state.equals("leftforward1")) {
 			leftmoveForward(9.0, 0.2);
@@ -416,6 +429,7 @@ public class Robot extends IterativeRobot {
 		else 
 			leftEncoder.reset();
 			rightEncoder.reset();
+			System.out.println("Encoder should be: " + feetToEncUnits(feet));
 			System.out.println("finished moving!");
 			return true;
 	}
@@ -433,7 +447,7 @@ public class Robot extends IterativeRobot {
 			} 
 			else {
 				right.set(.05);
-				left.set(-.05);
+				left.set(.05);
 			}
 		}
 		else if (degrees <= 0) {
